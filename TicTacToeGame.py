@@ -214,7 +214,6 @@ class TicTacToeGame:
     def play_ai_turn(self):
 
         board = self.board_state.flatten()
-        #move = self.ai.play_at_random(board)
         move = self.ai.play_good_move(board)
 
         self.previous_board_states.push(self.board_state)
@@ -226,9 +225,6 @@ class TicTacToeGame:
     def check_game_over(self):
         to_check = []
         board = np.array(self.board_state)
-
-        #to_check.append([np.diagonal(board),np.diagonal(board.transpose()), board[0], board[1], board[2],
-                                                        #board.T[0], board.T[1], board.T[2]])
 
         to_check.append([np.diagonal(board),np.fliplr(board).diagonal(), board[0], board[1], board[2],
                                                         board.T[0], board.T[1], board.T[2]])

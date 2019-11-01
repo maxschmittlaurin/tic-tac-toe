@@ -23,6 +23,12 @@ class AI:
     # description du TP .
     def play_good_move(self, board):
 
+    	# L'algorithme minimax et la création de l'arbre des coups possibles prennent
+    	# plus de temps lorsque l'état du plateau est vide et que c'est le tour de
+    	# l'AI à jouer. On donne donc un coup par défaut dans un coin du plateau 
+    	# qu'on sait qui est certainement optimal comme le joueur n'a pas encore
+    	# joué.
+
     	if self.check_is_empty_board(board):
     		best_move = 8
 
@@ -30,12 +36,16 @@ class AI:
 
     		possible_moves_tree = self.create_possible_moves_tree(board)
 
-    		# On obtient le noeud qui représente le meilleur coup possible.
+    		# On obtient le noeud qui représente le meilleur coup possible
+    		# contenu dans un tuple (noeud du meilleur coup possible, valeur minimax)
+    		# retourné par la fonction minimax.
 
     		best_move_node = self.minimax(possible_moves_tree.get_root(), True)[0]
 
-    		# On obtient la position de la case qui correspond au meilleur
-			# coup possible.
+    		# On obtient la position de la case qui correspond au meilleur coup
+			# possible contenu dans un tuple
+			# (état du plateau, état de la partie, position de la case jouée)
+			# assigné à l'attribut 'data' de l'instance 'Node'.
 
     		best_move = best_move_node.get_data()[2]
 
@@ -60,47 +70,43 @@ class AI:
 
         return possible_moves_tree
 
-    # 
+    # Retourne un tuple (noeud représentant le meilleur coup possible à
+    # jouer, sa valeur minimax) en fonction d'un noeud qui représente
+    # l'état du plateau actuel et de s'il s'agit du tour de l'AI ou non.
 
     def minimax(self, node, ai_turn):
 
-    	# Si le noeud est une feuille, on retourne dans un tuple le
-    	# noeud et la valeur minimax du coup.
+    	# Si le noeud est une feuille, on retourne dans un tuple ce
+    	# noeud représentant un état du plateau et sa valeur minimax.
 
     	if node.is_leaf():
     		return (node, node.get_data()[1])
-    		#return (node, node.get_data()[1])
 
-    	# List des prochains coups possibles représentés sous formes
-    	# de tuples (noeud contenant les infos du coup, valeur minimax du coup)
+    	# Liste de tuples (noeud représentant un coup possible,
+    	# sa valeur minimax) qui servira à choisir le meilleur coup parmi
+    	# tous les coups possibles.
 
     	possible_moves = []
 
     	for child in node.children:
     		possible_moves.append((child, self.minimax(child, not ai_turn)[1]))
-    		#possible_moves.append(self.minimax(child, not ai_turn))
 
-    	# On trie la List des coups possibles (représentés par des tuples)
-    	# en ordre croissant selon les valeurs minimax des coups (stockées
-    	# à la deuxième position de chaque tuple).
+    	# On trie la liste en ordre croissant selon les valeurs minimax des 
+    	# coups (stockées à la deuxième position de chaque tuple).
 
     	possible_moves.sort(key = operator.itemgetter(1))
 
-    	# Si le noeud simule le coup de l'AI, le meilleur coup est celui
-    	# qui a la plus grande valeur parmis celles retournées par les
-    	# enfants.
+    	# Si c'est le tour de l'AI de jouer, le meilleur coup possible à jouer
+    	# est celui ayant la plus grande valeur minimax.
 
     	if ai_turn:
     		return possible_moves[-1]
-    		#return possible_moves[-1]
 
-    	# Si le noeud simule le coup du joueur, le meilleur coup est celui
-    	# qui a la plus petite valeur parmis celles retournées par les
-    	# enfants.
+    	# Si c'est le tour du joueur de jouer, le meilleur coup possible à jouer
+    	# est celui ayant la plus petite valeur minimax.
 
     	else :
     		return possible_moves[0]
-    		#return possible_moves[0]
 
     # Détermine les prochains coups possibles selon un état du plateau
     # (contenu dans un noeud).
