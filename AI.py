@@ -1,4 +1,4 @@
-# Nom : Maximilien Schmitt-Laurin
+# Author : Maximilien Schmitt-Laurin
 # Date : 31 octobre 2019
 
 import numpy as np
@@ -10,8 +10,9 @@ class AI:
     def __init__(self):
         pass
 
-    # Fonction de base de l'AI, faire des moves au hasard.
-    # Ne gagne pratiquement jamais.
+    # Basic function of the AI, making random moves.
+    # Almost never wins.
+	
     def play_at_random(self, board):
 
         free_index = np.where(board == " ")
@@ -19,15 +20,13 @@ class AI:
 
         return move
 
-    # Votre fonction pour l'AI, qui doit ne jamais perdre ! Pour les détails, voir la
-    # description du TP .
     def play_good_move(self, board):
 
-    	# L'algorithme minimax et la création de l'arbre des coups possibles prennent
-    	# plus de temps lorsque l'état du plateau est vide et que c'est le tour de
-    	# l'AI à jouer. On donne donc un coup par défaut dans un coin du plateau 
-    	# qu'on sait qui est certainement optimal comme le joueur n'a pas encore
-    	# joué.
+    	# The minimax algorithm and the creation of the tree of possible moves
+    	# take more time when the board state is empty and it is the turn
+    	# of the IA to play. We therefore give a default move in a corner of the
+    	# board that we know is certainly optimal as the player has not yet
+    	# played.
 
     	if self.check_is_empty_board(board):
     		best_move = 8
@@ -36,33 +35,32 @@ class AI:
 
     		possible_moves_tree = self.create_possible_moves_tree(board)
 
-    		# On obtient le noeud qui représente le meilleur coup possible
-    		# contenu dans un tuple (noeud du meilleur coup possible, valeur minimax)
-    		# retourné par la fonction minimax.
+    		# We obtain the node that represents the best possible move
+    		# contained in a tuple (node of the best possible move, minimax value)
+    		# returned by the minimax function.
 
     		best_move_node = self.minimax(possible_moves_tree.get_root(), True)[0]
 
-    		# On obtient la position de la case qui correspond au meilleur coup
-			# possible contenu dans un tuple
-			# (état du plateau, état de la partie, position de la case jouée)
-			# assigné à l'attribut 'data' de l'instance 'Node'.
+    		# We obtain the position of the square that corresponds to the best possible
+			# move contained in a tuple
+			# (state of the board, state of the game, position of the played square)
+			# assigned to the 'data' attribute of the 'Node' instance.
 
     		best_move = best_move_node.get_data()[2]
 
     	return best_move
 
-    # Retourne un arbre dont la racine est l’état courant du plateau et chaque
-    # enfant de la racine est un des ́états du plateau possible après un coup
-    # et ainsi de suite, jusqu’à atteindre une feuille, qui correspond à une fin
-    # de partie.
+    # Returns a tree whose root is the current board state and the 
+    # children of each node are the possible ́board states after a 
+    # certain move played. A leaf in this tree means that the game
+	# is finished.
 
     def create_possible_moves_tree(self, board):
 
-    	# Les noeuds de l'arbre vont stocker des tuples
-    	# (état du plateau, état de la partie, position de la case jouée)
-    	# où "état de la partie" vaut 1 si l'AI a gagné, -1 si c'est le 
-    	# joueur qui a gagné, 0 si la partie est nulle et None si la 
-    	# partie n'est pas terminée.
+    	# The nodes of the tree will store tuples
+    	# (state of the board, state of the game, position of the played square)
+    	# where "state of the game" is 1 if the AI won, -1 if the player won,
+    	# 0 if the game is a draw and None if the game is not finished.
 
         root = Node((board, None, None))
         possible_moves_tree = Tree(root)
@@ -70,57 +68,57 @@ class AI:
 
         return possible_moves_tree
 
-    # Retourne un tuple (noeud représentant le meilleur coup possible à
-    # jouer, sa valeur minimax) en fonction d'un noeud qui représente
-    # l'état du plateau actuel et de s'il s'agit du tour de l'AI ou non.
+    # Returns a tuple (node representing the best possible move to play, its
+    # minimax value) according to a node that represents the current board 
+    # state and whether it is the AI's turn or not.
 
     def minimax(self, node, ai_turn):
 
-    	# Si le noeud est une feuille, on retourne dans un tuple ce
-    	# noeud représentant un état du plateau et sa valeur minimax.
+    	# If the node is a leaf, we return in a tuple the board state
+    	# associated to this node and its minimax value.
 
     	if node.is_leaf():
     		return (node, node.get_data()[1])
 
-    	# Liste de tuples (noeud représentant un coup possible,
-    	# sa valeur minimax) qui servira à choisir le meilleur coup parmi
-    	# tous les coups possibles.
+    	# List of tuples (node representing a possible move, its minimax 
+    	# value) that will be used to choose the best move among all 
+    	# possible moves.
 
     	possible_moves = []
 
     	for child in node.children:
     		possible_moves.append((child, self.minimax(child, not ai_turn)[1]))
 
-    	# On trie la liste en ordre croissant selon les valeurs minimax des 
-    	# coups (stockées à la deuxième position de chaque tuple).
+    	# We sort the list in ascending order according to the minimax 
+    	# values of the moves (stored at the second position of each tuple).
 
     	possible_moves.sort(key = operator.itemgetter(1))
 
-    	# Si c'est le tour de l'AI de jouer, le meilleur coup possible à jouer
-    	# est celui ayant la plus grande valeur minimax.
+    	# If it is the AI's turn to play, the best possible move to play is the
+    	# one with the highest minimax value.
 
     	if ai_turn:
     		return possible_moves[-1]
 
-    	# Si c'est le tour du joueur de jouer, le meilleur coup possible à jouer
-    	# est celui ayant la plus petite valeur minimax.
+    	# If it is the player's turn to play, the best possible move to play is
+    	# the one with the lowest minimax value.
 
     	else :
     		return possible_moves[0]
 
-    # Détermine les prochains coups possibles selon un état du plateau
-    # (contenu dans un noeud).
+    # Determines the next possible moves according to a state of the board
+	# (contained in a node).
 
     def find_next_possible_moves(self, node, ai_turn):
 
         board_state = node.get_data()[0]
 
-        # On passe chaque case du plateau en itération...
+        # We pass each square of the board in iteration...
 
         for i in range(len(board_state)):
 
-        	# Si une case est vide, un coup pourrait avoir lieu dans
-        	# cette case au prochain tour.
+        	# If a square is empty, a move could take place in that square
+			# on the next turn.
 
             if board_state[i] == " ":
 
@@ -133,64 +131,63 @@ class AI:
                     possible_move_board_state[i] = "X"
 
 
-                # Si on obtient une partie nulle avec ce prochain coup
-                # possible, on l'indique dans le noeud enfant.
+                # If we get a draw with this next possible move, we indicate it
+                # in the child node.
 
                 if self.check_draw(possible_move_board_state):
 
                 	child = Node((possible_move_board_state, 0, i))
                 	node.add_child(child)
 
-                # Si l'AI gagne avec ce prochain coup possible, on
-                # l'indique dans le noeud enfant.
+                # If the AI wins with this next possible move, it is indicated in the 
+                # child node.
 
                 elif self.check_victory(possible_move_board_state, "O"):
 
                 	child = Node((possible_move_board_state, 1, i))
                 	node.add_child(child)
 
-                # Si le joueur gagne avec ce prochain coup possible,
-                # on l'indique dans le noeud enfant.
+                # If the player wins with this next possible move, it is indicated in the 
+                # child node.
 
                 elif self.check_victory(possible_move_board_state, "X"):
 
                 	child = Node((possible_move_board_state, -1, i))
                 	node.add_child(child)
 
-                # Sinon on vérifie seulement les coups possibles qui
-                # peuvent suivre ce prochain coup possible.
+                # Otherwise we only check the possible moves that can follow
+                # this next possible move.
 
                 else:
                 	child = Node((possible_move_board_state, None, i))
                 	node.add_child(child)
                 	self.find_next_possible_moves(child, not ai_turn)
 
-    # Détermine si on a une victoire sur le plateau selon le symbole
-    # utilisé.
+    # Determines if there is a victory on the board according to the symbol used.
 
     def check_victory(self, board, symbol):
 
-    	# Si on a une victoire sur la première diagonale...
+    	# Chech if we have a victory on the first diagonal...
     	if board[0] == board[4] == board[8] == symbol:
     		return True
 
-    	# Si on a une victoire sur la deuxième diagonale...
+    	# Chech if we have a victory on the second diagonal...
     	if board[2] == board[4] == board[6] == symbol:
     		return True
 
     	for i in range(0, 3):
 
-    		# Si on a une victoire sur une ligne horizontale du plateau...
+    		# Chech if you have a victory on a horizontal line of the board...
     		if board[i*3] == board[i*3+1] == board[i*3+2] == symbol:
     			return True
 
-    		# Si on a une victoire sur une ligne verticale du plateau...
+    		# Chech if you have a victory on a vertical line of the board...
     		if board[i] == board[i+3] == board[i+6] == symbol:
     			return True
 
     	return False
 
-    # Détermine si on a une partie nulle sur le plateau.
+    # Determines if there is a draw on the board.
 
     def check_draw(self, board):
 
@@ -206,7 +203,7 @@ class AI:
     	        not self.check_victory(board, "O") and 
     	        not self.check_victory(board, "X"))
 
-    # Détermine si le plateau est vide.
+    # Determines if the board is empty.
 
     def check_is_empty_board(self, board):
 

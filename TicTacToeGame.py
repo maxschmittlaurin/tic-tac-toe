@@ -1,4 +1,4 @@
-# Nom : Maximilien Schmitt-Laurin
+# Author : Maximilien Schmitt-Laurin
 # Date : 31 octobre 2019
 
 import numpy as np
@@ -10,31 +10,35 @@ class TicTacToeGame:
 
     def __init__(self):
 
-        # On initie la grille et on met des strings vides pour symboliser aucun move en fait
+        # We initiate the grid and we put empty strings to symbolize that no move has been played
         self.board_state = np.zeros([3,3], dtype='str')
 
         self.previous_board_states = Stack()
 
         self.ai = AI()
+
         for i in range(len(self.board_state)):
             self.board_state[i] = " "
 
     def start_new_game(self):
+
         self.player_order = ""
+
         while self.player_order != "f" and self.player_order != "s":
-            self.player_order = input("Press 'f' to play first or 's' to play second ")
+            self.player_order = input("\nPress 'f' to play first or 's' to play second : ")
 
         game_over = False
         self.print_board()
-        # Boucle de jeu
+
+        # Game loop
         while game_over == False:
             game_over = self.playTurn()
 
         self.reverse_previous_board_states = Stack()
 
-        # On inverse l'ordre de la pile de sorte que le prochain état
-        # de plateau à être 'pop' est l'état le plus ancien plutôt que du 
-        # plus récent.
+        # We reverse the order of the stack so that the next board state
+        # to come out of the stack is the oldest state rather than 
+        # the most recent.
 
         while not self.previous_board_states.isEmpty():
 
@@ -43,35 +47,35 @@ class TicTacToeGame:
 
         replay = Replay()
 
-        # On remplie notre structure 'replay' avec les états du plateau
-        # partant du plus ancien état au plus récent.
+        # We fill our 'replay' structure with the board states
+        # starting from the oldest state to the most recent.
 
         while not self.reverse_previous_board_states.isEmpty():
 
             b = self.reverse_previous_board_states.pop()
             replay.enqueue(b)
 
-        print("Désirez-vous revoir votre partie ? Appuyez sur la touche 'y' si oui. Si ce n'est pas le cas et vous voulez quitter, appuyez sur n'importe quelle autre touche.")
-        a = input("Choix :    ")
+        print("\nDo you want to review your game ? Press the 'y' key if you do. If not and you want to quit, press any other key.")
+        a = input("\nChoice :    ")
 
         if a == "y":
 
-            # On initialise l'état courant du plateau à rejouer.
+            # We initialize the board state to be replayed.
             replay.start_replay()
 
-            # L'état courant du plateau à rejouer devient l'état actuel du
-            # plateau.
+            # The current board state becomes the state
+            # to be replayed.
 
             self.board_state = replay.current.data
             self.print_board()
 
             while True:
 
-                print("Appuyez sur la touche 'n' pour voir le prochain coup")
-                print("Appuyez sur la touche 'p' pour voir le coup précédent")
-                print("Appuyez sur la touche 'q' pour quitter")
+                print("\nPress the 'n' key to see the next move")
+                print("\nPress the 'p' key to see the previous move")
+                print("\nPress the 'q' key to exit")
 
-                c = input("Choix :    ")
+                c = input("\nChoice :    ")
 
                 if c == "n":
 
@@ -133,13 +137,13 @@ class TicTacToeGame:
 
         while player_turn_over != True:
 
-            inp = input("Entrez la case que vous vouler jouer ou appuyez sur 'u' pour effacer votre coup joué :    ")
+            inp = input("\nChoose which square you want to play (1-9) or press 'u' to undo your move :        ")
 
             try:
                 i = int(inp) - 1
             except:
 
-                # Si on veut 'undo'...
+                # If we want to undo...
 
                 if inp == "u":
 
@@ -152,10 +156,10 @@ class TicTacToeGame:
                     i = 1000
 
             if i > 8 or i < 0:
-                print("Case inexistante. Prenez une valeur entre 0 et 9.")
+                print("\nNon-existent square. Please choose a value between 1 and 9.")
 
             elif board[i] != " ":
-                print("Case déjà occupée")
+                print("\nThe square is already occupied.")
 
             else:
 
@@ -166,26 +170,26 @@ class TicTacToeGame:
                 player_turn_over = True
                 self.print_board()
 
-    # Retrouve l’état du plateau juste avant le dernier coup du joueur
-    # et le met comme ́etat courant du plateau.
+    # Find the board state just before the player's last move
+    # and mark it as the current state.
 
     def Undo(self):
 
         if self.previous_board_states.size() < 2:
-            print("Impossible d'effacer le dernier coup joué")
+            print("\nImpossible to undo this move.")
             return
 
         else:
 
-            # On doit revenir deux états en arrière de la partie.
+            # We must remove two states at the same time.
 
-            # On enlève l'état précédent du plateau dont le coup a
-            # été joué par l'AI.
+            # The previous board state whose move was played by
+            # the AI is removed.
 
             self.previous_board_states.pop()
 
-            # On enlève l'état du plateau qui précède l'état précédent
-            # dont le coup a été joué par le jour.
+            # Remove the board state that was preceding the previous
+            # state whose move was played by the player.
 
             self.board_state = self.previous_board_states.pop()
 
@@ -220,6 +224,7 @@ class TicTacToeGame:
 
         board[move] = "O"
         self.board_state = np.reshape(board, (3, 3))
+        print("\nYour opponent has just played his turn!")
         self.print_board()
 
     def check_game_over(self):
@@ -231,14 +236,14 @@ class TicTacToeGame:
 
         for col in to_check[0]:
             if col[0] == col[1] and col[1] == col[2] and col[2] != " ":
-                print("Les " + col[0] + " remportent la partie !")
+                print("\nThe " + col[0] + " win the game !")
 
                 self.previous_board_states.push(self.board_state)
 
                 return True
 
         if np.isin(" ", board) == False:
-            print("Partie nulle !")
+            print("\nIt's a draw !")
 
             self.previous_board_states.push(self.board_state)
 

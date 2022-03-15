@@ -1,4 +1,4 @@
-# Nom : Maximilien Schmitt-Laurin
+# Author : Maximilien Schmitt-Laurin
 # Date : 31 octobre 2019
 
 class Stack:
